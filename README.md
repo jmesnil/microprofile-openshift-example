@@ -89,7 +89,7 @@ The application defines 2 probes:
 * `numbers.randomFailure` is a probe that randomly fails.
 
 The `numbers.config` probe is provided by the `ConfigHealthCheck` class. When this class is called, it verifies that the configuration of `NumbersGenerator` is correct.
-If it is correct, it returns `UP`. Otherwise it returns `DOWN` (as calls to NumbersGenerator.nextInts()` will fail).`
+If it is correct, it returns `UP`. Otherwise it returns `DOWN` (as calls to `NumbersGenerator.nextInts()` will fail).
 
 The `numbers.randomFailure` is a second probe that randomly fails (we had it to illustrate that an application may provide many different probes).
 It is configured using a float property named `num.failureRate` that controls the rate of failure of the probe. For example if its value is `0.85`, the probe
