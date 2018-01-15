@@ -1,5 +1,5 @@
 swarm:
-  logging: INFO
+#  logging: INFO
 #  microprofile-config:
 #    config-sources:
 #     openshift-config-map:

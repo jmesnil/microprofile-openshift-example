@@ -153,7 +153,22 @@ This probe includes `data` that helps identify why the check fails. We can see h
 
 ## Deploy the application on OpenShift
 
-TODO
+Sign up at [OpenShift][openshift]
+
+
+### Create Project
+
+* `Name`: `my-numbers-app`
+
+### Add Docker image to Project
+
+* `Add to Project` > `Deploy Image`
+* `Image Name`: jmesnil/microprofile-numbers-app
+* `Deploy`
+
+
+* `Applications` -> `Routes` -> `Create Route`
+* `Name`: `my-numbers-route`
 
 ### Create a Config Map
 
@@ -171,3 +186,4 @@ TODO
 [swarm]: http://wildfly-swarm.io
 [mp-config]: https://github.com/eclipse/microprofile-config
 [mp-healthcheck]: https://github.com/eclipse/microprofile-health
+[openshift]: https://www.openshift.com
