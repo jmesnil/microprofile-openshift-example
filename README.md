@@ -16,18 +16,18 @@ $ curl  http://localhost:8080/
 The application uses [MicroProfile Config][mp-config] to configure its behaviour.
 It defines two configuration properties:
 
-* `num.size` - the number of generated random integers (3 by default)
-* `num.max` - the maximum value of integer (`Integer.MAX_VALUE` by default)
+* `num_size` - the number of generated random integers (3 by default)
+* `num_max` - the maximum value of integer (`Integer.MAX_VALUE` by default)
 
 These 2 properties are configured using the Eclipse MicroProfile Config API in the NumbersGenerator class.
 
 ```
 @Inject
-@ConfigProperty(name = "num.size", defaultValue = "3")
+@ConfigProperty(name = "num_size", defaultValue = "3")
 private int numSize;
 
 @Inject
-@ConfigProperty(name = "num.max", defaultValue = "" + Integer.MAX_VALUE)
+@ConfigProperty(name = "num_max", defaultValue = "" + Integer.MAX_VALUE)
 private int numMax;
 ```
 
@@ -58,11 +58,11 @@ $ java -jar target/numbers-swarm.jar
 
 ### Configuring the application
 
-We can now use System properties to change the configuration of the application to generate `5` (configured with `num.size`) integers
- between `0` and `10` (configured with `num.max`).
+We can now use System properties to change the configuration of the application to generate `5` (configured with `num_size`) integers
+ between `0` and `10` (configured with `num_max`).
 
 ```
-$ java -jar target/numbers-swarm.jar -Dnum.size=5 -Dnum.max=10
+$ java -jar target/numbers-swarm.jar -Dnum_size=5 -Dnum_max=10
 ...
 2018-01-15 12:01:18,345 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "numbers.war" (runtime-name : "numbers.war")
 2018-01-15 12:01:18,357 INFO  [org.wildfly.swarm] (main) WFSWARM99999: WildFly Swarm is Ready
@@ -92,7 +92,7 @@ The `numbers.config` probe is provided by the `ConfigHealthCheck` class. When th
 If it is correct, it returns `UP`. Otherwise it returns `DOWN` (as calls to `NumbersGenerator.nextInts()` will fail).
 
 The `numbers.randomFailure` is a second probe that randomly fails (we had it to illustrate that an application may provide many different probes).
-It is configured using a float property named `num.failureRate` that controls the rate of failure of the probe. For example if its value is `0.85`, the probe
+It is configured using a float property named `num_failure_rate` that controls the rate of failure of the probe. For example if its value is `0.85`, the probe
 returns `DOWN` 85% it is called.
 
 The healthiness of the application can be checked by calling the `http://localhost:8080/health` endpoint that is provided automatically by WildFly Swarm
@@ -104,8 +104,8 @@ $ curl -v  http://localhost:8080/health
 < HTTP/1.1 200 OK
 ...
 {"checks": [
-{"name":"numbers.failureRate","state":"UP","data": {"num.failureRate":"0.0"}},
-{"name":"numbers.config","state":"UP","data": {"num.size":3,"num.max":2147483647}}],
+{"name":"numbers.failureRate","state":"UP","data": {"num_failure_rate":"0.0"}},
+{"name":"numbers.config","state":"UP","data": {"num_size":3,"num_max":2147483647}}],
 "outcome": "UP"
 }
 ```
@@ -113,10 +113,10 @@ $ curl -v  http://localhost:8080/health
 The `200 OK` response indicates that the overall healthiness of the application is `UP` (using the `outcome` property).
 It also lists the outcome of individual probes. In that case both `numbers.config` and `numbers.failureRate` are `UP`.
 
-Let's now start the application with an *invalid* configuration by setting `num.max` to `-10`:
+Let's now start the application with an *invalid* configuration by setting `num_max` to `-10`:
 
 ```
-$ java -jar target/numbers-swarm.jar -Dnum.max=-10
+$ java -jar target/numbers-swarm.jar -Dnum_max=-10
 ...
 2018-01-15 12:23:16,951 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "numbers.war" (runtime-name : "numbers.war")
 2018-01-15 12:23:16,966 INFO  [org.wildfly.swarm] (main) WFSWARM99999: WildFly Swarm is Ready
@@ -141,34 +141,19 @@ $ curl -v  http://localhost:8080/health
 < HTTP/1.1 503 Service Unavailable
 ...
 {"checks": [
-{"name":"numbers.failureRate","state":"UP","data": {"num.failureRate":"0.0"}},
-{"name":"numbers.config","state":"DOWN","data": {"num.size":3,"num.max":-10}}],
+{"name":"numbers.failureRate","state":"UP","data": {"num_failure_rate":"0.0"}},
+{"name":"numbers.config","state":"DOWN","data": {"num_size":3,"num_max":-10}}],
 "outcome": "DOWN"
 }
 ```
 
 The `503 Service Unavailable` response indicates that the application is not healthy.
 The list of `checks` indicates that the `numbers.config` probe is `DOWN`.
-This probe includes `data` that helps identify why the check fails. We can see here that it is due to an invalid `num.max` value.
+This probe includes `data` that helps identify why the check fails. We can see here that it is due to an invalid `num_max` value.
 
 ## Deploy the application on OpenShift
 
 Sign up at [OpenShift][openshift]
-
-
-### Create Project
-
-* `Name`: `my-numbers-app`
-
-### Add Docker image to Project
-
-* `Add to Project` > `Deploy Image`
-* `Image Name`: jmesnil/microprofile-numbers-app
-* `Deploy`
-
-
-* `Applications` -> `Routes` -> `Create Route`
-* `Name`: `my-numbers-route`
 
 ### Create a Config Map
 

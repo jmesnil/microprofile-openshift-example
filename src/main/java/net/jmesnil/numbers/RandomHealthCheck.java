@@ -38,7 +38,7 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
  * This health check can be configured with a failure rate to determine how often calls to the health check will fail.
  * By default, this health check is always UP.
  *
- * The configuration property {@code num.failureRate} can be configured to determine this rate.
+ * The configuration property {@code num_failure_rate} can be configured to determine this rate.
  * A value of 0.0 means that the health check is always UP (0% of failure).
  * A value of 1.0 means that the health check is always DOWN (100% of failure).
  * Any value between 0.1 and 1.0 determines the failure rate (e.g. a value of 0.85 means 85% of failure).
@@ -50,7 +50,7 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 class RandomHealthCheck implements HealthCheck {
 
     @Inject
-    @ConfigProperty(name="num.failureRate", defaultValue = "0")
+    @ConfigProperty(name="num_failure_rate", defaultValue = "0")
     float failureRate;
 
     private final Random random = new Random();
@@ -58,7 +58,7 @@ class RandomHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         return HealthCheckResponse.named("numbers.randomFailure")
-                .withData("num.failureRate", "" + failureRate)
+                .withData("num_failure_rate", "" + failureRate)
                 .state(random.nextFloat() > failureRate)
                 .build();
     }

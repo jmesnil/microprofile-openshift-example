@@ -38,8 +38,8 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
  *
  * This class generates a list of random integers.
  * The list of integers is controlled by 2 configuration properties:
- * * {@code num.size} - the number of generated random integers (3 by default)
- * * {@code num.max} - the maximum value of integer (Integer.MAX_VALUE by default)
+ * * {@code num_size} - the number of generated random integers (3 by default)
+ * * {@code num_max} - the maximum value of integer (Integer.MAX_VALUE by default)
  *
  * The minimum value is set to 0.
  *
@@ -49,11 +49,11 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 public class NumbersGenerator {
 
     @Inject
-    @ConfigProperty(name = "num.size", defaultValue = "3")
+    @ConfigProperty(name = "num_size", defaultValue = "3")
     private int numSize;
 
     @Inject
-    @ConfigProperty(name = "num.max", defaultValue = "" + Integer.MAX_VALUE)
+    @ConfigProperty(name = "num_max", defaultValue = "" + Integer.MAX_VALUE)
     private int numMax;
 
     // minimum value of generated integers
@@ -96,8 +96,8 @@ public class NumbersGenerator {
         public HealthCheckResponse call() {
             return HealthCheckResponse.named("numbers.config")
                     .state(checkConfig())
-                    .withData("num.size", generator.numSize)
-                    .withData("num.max",generator.numMax)
+                    .withData("num_size", generator.numSize)
+                    .withData("num_max",generator.numMax)
                     .build();
         }
     }
