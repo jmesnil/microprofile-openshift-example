@@ -1,6 +1,6 @@
 swarm:
 #  logging: INFO
-#  microprofile-config:
-#    config-sources:
-#     openshift-config-map:
-#       dir: "/etc/config/numbers-app/"
+#   microprofile-config:
+#     config-sources:
+#      openshift-config-map:
+#        dir: "/etc/config/numbers-app/"
