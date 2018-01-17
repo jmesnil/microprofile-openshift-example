@@ -43,8 +43,6 @@ public class NumbersApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-
-        System.out.println(">>> dir  = " + System.getProperty("jboss.server.log.dir"));
         Set<Class<?>> classes = new HashSet<>();
         classes.add(NumbersEndpoint.class);
         return classes;
