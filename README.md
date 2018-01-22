@@ -83,17 +83,12 @@ if it is not the case.
 
 However to illustrate the use of [MicroProfile Healthcheck][mp-healthcheck], we will use health check probes to determine the overall healthiness of the application.
 
-The application defines 2 probes:
+The application defines 1 probe:
 
 * `numbers.config` is a probe that checks that the configuration of `NumbersGenerator` is correct.
-* `numbers.randomFailure` is a probe that randomly fails.
 
 The `numbers.config` probe is provided by the `ConfigHealthCheck` class. When this class is called, it verifies that the configuration of `NumbersGenerator` is correct.
 If it is correct, it returns `UP`. Otherwise it returns `DOWN` (as calls to `NumbersGenerator.nextInts()` will fail).
-
-The `numbers.randomFailure` is a second probe that randomly fails (we had it to illustrate that an application may provide many different probes).
-It is configured using a float property named `num_failure_rate` that controls the rate of failure of the probe. For example if its value is `0.85`, the probe
-returns `DOWN` 85% it is called.
 
 The healthiness of the application can be checked by calling the `http://localhost:8080/health` endpoint that is provided automatically by WildFly Swarm
 (the application does not provide this `/health` endpoint).
@@ -104,14 +99,13 @@ $ curl -v  http://localhost:8080/health
 < HTTP/1.1 200 OK
 ...
 {"checks": [
-{"name":"numbers.failureRate","state":"UP","data": {"num_failure_rate":"0.0"}},
 {"name":"numbers.config","state":"UP","data": {"num_size":3,"num_max":2147483647}}],
 "outcome": "UP"
 }
 ```
 
 The `200 OK` response indicates that the overall healthiness of the application is `UP` (using the `outcome` property).
-It also lists the outcome of individual probes. In that case both `numbers.config` and `numbers.failureRate` are `UP`.
+It also lists the outcome of individual probes. In our case, the single `numbers.config` probe is `UP`.
 
 Let's now start the application with an *invalid* configuration by setting `num_max` to `-10`:
 
@@ -141,7 +135,6 @@ $ curl -v  http://localhost:8080/health
 < HTTP/1.1 503 Service Unavailable
 ...
 {"checks": [
-{"name":"numbers.failureRate","state":"UP","data": {"num_failure_rate":"0.0"}},
 {"name":"numbers.config","state":"DOWN","data": {"num_size":3,"num_max":-10}}],
 "outcome": "DOWN"
 }
@@ -153,19 +146,56 @@ This probe includes `data` that helps identify why the check fails. We can see h
 
 ## Deploy the application on OpenShift
 
-Sign up at [OpenShift][openshift]
+* Sign up at [OpenShift][openshift]
 
-### Create a Config Map
+```
+$ oc login
+$ oc status
+$ mvn -Popenshift clean fabric8:deploy
+$ oc get routes/microprofile-openshift-example
+NAME                             HOST/PORT                                                      PATH      SERVICES                         PORT      TERMINATION   WILDCARD
+microprofile-openshift-example   microprofile-openshift-example-myproject.192.168.64.4.nip.io             microprofile-openshift-example   8080                    None
+```
 
-TODO
+
+### Configure environment variables in OpenShift
+
+```
+$ oc env dc/microprofile-openshift-example --list
+# deploymentconfigs microprofile-openshift-example, container wildfly-swarm
+# KUBERNETES_NAMESPACE from field path metadata.namespace
+
+$ oc env dc/microprofile-openshift-example num_size=5 num_max=10
+
+$ oc env dc/microprofile-openshift-example --list
+# deploymentconfigs microprofile-openshift-example, container wildfly-swarm
+# KUBERNETES_NAMESPACE from field path metadata.namespace
+num_size=5
+num_max=10
+```
 
 ### Configure the readiness probe
 
-TODO
+The readiness probe is automatically configured in OpenShift to use the `/health` endpoint of our application by the `fabric8` Maven plugin is configured in the `pom.xml`:
 
-### Update the Config Map
+```
+<plugin>
+  <groupId>io.fabric8</groupId>
+  <artifactId>fabric8-maven-plugin</artifactId>
+  ...
+  <configuration>
+    ...
+    <enricher>
+      <config>
+        <wildfly-swarm-health-check>
+          <path>/health</path>
+        </wildfly-swarm-health-check>
+      </config>
+    </enricher>
+  </configuration>
+</plugin>
+```
 
-TODO
 
 [microprofile]: https://microprofile.io
 [swarm]: http://wildfly-swarm.io
