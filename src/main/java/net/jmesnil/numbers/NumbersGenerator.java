@@ -32,6 +32,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
 /**
  * The Numbers Generator.
@@ -81,24 +82,25 @@ public class NumbersGenerator {
     @Health
     static class ConfigHealthCheck implements HealthCheck {
 
+        private static final String PROBE_NAME = "numbers.config";
+
         @Inject
         NumbersGenerator generator;
 
-        private boolean checkConfig() {
-            if (generator.numSize < 0 ||
-                    generator.numMax <= MIN_VALUE) {
-                return false;
-            }
-            return true;
-        }
-
         @Override
         public HealthCheckResponse call() {
-            return HealthCheckResponse.named("numbers.config")
-                    .state(checkConfig())
-                    .withData("num_size", generator.numSize)
-                    .withData("num_max",generator.numMax)
-                    .build();
+            if (generator.numSize < 0 ||
+                    generator.numMax <= MIN_VALUE) {
+                return HealthCheckResponse.named(PROBE_NAME)
+                        .withData("num_size", generator.numSize)
+                        .withData("num_max", generator.numMax)
+                        .down()
+                        .build();
+            } else {
+                return HealthCheckResponse.named(PROBE_NAME)
+                        .up()
+                        .build();
+            }
         }
     }
 }

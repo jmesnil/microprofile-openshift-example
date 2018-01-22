@@ -99,7 +99,7 @@ $ curl -v  http://localhost:8080/health
 < HTTP/1.1 200 OK
 ...
 {"checks": [
-{"name":"numbers.config","state":"UP","data": {"num_size":3,"num_max":2147483647}}],
+{"name":"numbers.config","state":"UP"}],
 "outcome": "UP"
 }
 ```
